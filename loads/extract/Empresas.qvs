@@ -1,0 +1,29 @@
+SET dataTransformed = ..\..\files\dataTransformed\;
+SET storage_pbi = ..\..\files\storage_pbi\;
+
+//Conecta ao base de dados TesteBi no Banco PostgresSQL
+ODBC CONNECT TO POSTGRESQL30 (XUSERID IS BBPLDYDNTDDOGZVMTTZB, XPASSWORD IS TEBWBXNOJLBCGZFGSZMML);
+
+//Faz a busca das empresas
+[EMPRESA]:
+LOAD *;
+SELECT * FROM EMPRESAS;
+//Liga os valores com as empresas
+lEFT JOIN (EMPRESA)
+LOAD cd_cnpj, 
+     vl_latitude, 
+     vl_longitude, 
+     vl_total_veiculos_antt, 
+     vl_total_veiculos_leves, 
+     vl_total_veiculos_pesados, 
+     fl_optante_simples, 
+     qt_filial, 
+     fl_optante_simei, 
+     de_saude_tributaria, 
+     de_nivel_atividade
+FROM [..\..\files\spreadsheets\empresasCalc.csv]
+(TXT, UTF8, EMBEDDED LABELS, DELIMITER IS ';', MSQ);
+
+STORE [EMPRESA] INTO $(dataTransformed)EMPRESAS.CSV (txt, delimiter is ';' );
+STORE [EMPRESA] INTO $(storage_pbi)EMPRESAS.CSV (txt, delimiter is ';' );
+DROP TABLE EMPRESA;
