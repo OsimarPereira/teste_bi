@@ -1,0 +1,17 @@
+SET dataTransformed = ..\..\files\dataTransformed\;
+SET storage_pbi = ..\..\files\storage_pbi\;
+
+//Carrega a tabela CNAE tratando os campos multivalorados
+[CNAE]:
+LOAD cd_cnpj,
+     subfield(nu_ordem,'~@~',iterno()) as nu_ordem, 
+     subfield(cd_ramo_atividade,'~@~',iterno()) as cd_ramo_atividade, 
+     subfield(de_ramo_atividade,'~@~',iterno()) as de_ramo_atividade,
+     mid(subfield(cd_ramo_atividade,'~@~',iterno()),1,2) as chave_cnae
+FROM [..\..\FILES\SPREADSHEETS\CNAE.CSV]
+(TXT, UTF8, EMBEDDED LABELS, DELIMITER IS ';', NO QUOTES)
+WHILE ITERNO() <= SUBSTRINGCOUNT(nu_ordem,'~@~')+1;
+
+STORE [CNAE] INTO $(dataTransformed)CNAE.CSV (txt, delimiter is ';' );
+STORE [CNAE] INTO $(storage_pbi)CNAE.CSV (txt, delimiter is ';' );
+DROP TABLE CNAE;

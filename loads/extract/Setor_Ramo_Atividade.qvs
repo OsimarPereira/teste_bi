@@ -1,0 +1,14 @@
+SET dataTransformed = ..\..\files\dataTransformed\;
+SET storage_pbi = ..\..\files\storage_pbi\;
+
+//Carrega os dados dos Setores e Ramos de Atividade.
+[SETOR_RAMO_ATIVIDADE]:
+LOAD atividade_ramo, 
+     divisoes, 
+     chave_cnae
+FROM [..\..\files\dataMirrors\SETOR_RAMO_ATIVIDADE.CSV]
+(txt, utf8, embedded labels, delimiter is ';', msq);
+
+STORE [SETOR_RAMO_ATIVIDADE] INTO $(dataTransformed)SETOR_RAMO_ATIVIDADE.CSV (txt, delimiter is ';' );
+STORE [SETOR_RAMO_ATIVIDADE] INTO $(storage_pbi)SETOR_RAMO_ATIVIDADE.CSV (txt, delimiter is ';' );
+DROP TABLE SETOR_RAMO_ATIVIDADE;
